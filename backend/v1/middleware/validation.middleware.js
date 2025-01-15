@@ -17,7 +17,8 @@ middleware.validateBody = (schema) => (req, res, next) => {
       )
     );
     res.status(422).json({
-      code: 422,
+      statusCode: 422,
+      status: "error",
       message: error.details.map((each) => each.message),
     });
   } else {

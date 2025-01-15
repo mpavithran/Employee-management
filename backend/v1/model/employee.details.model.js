@@ -51,7 +51,7 @@ const Employee = db.define(
     },
     status: {
       field: "status",
-      type: Sequelize.DataTypes.STRING,
+      type: Sequelize.DataTypes.INTEGER,
     },
   },
   {
