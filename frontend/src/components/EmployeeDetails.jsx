@@ -6,18 +6,24 @@ import toast, { Toaster } from "react-hot-toast";
 import useStore from "@/hooks/useStore";
 import { API } from "@/utils/API";
 import axios from "axios";
+import helperUtils from "@/utils/helperUtils";
 
-const EmployeeDetails = ({ setShowAction, getEmployeeDetails }) => {
+const EmployeeDetails = ({
+  setShowAction,
+  getEmployeeDetails,
+  editData,
+  employeeId,
+}) => {
   const navigate = useNavigate();
   const { setActiveTab } = useStore();
   const formik = useFormik({
     initialValues: {
-      name: "",
-      age: "",
-      position: "",
-      department: "",
-      mail: "",
-      mobileNumber: "",
+      name: editData?.name ?? "",
+      age: editData?.age ?? "",
+      position: editData?.position ?? "",
+      department: editData?.department ?? "",
+      mail: editData?.mailId ?? "",
+      mobileNumber: editData?.mobileNumber ?? "",
     },
     // validationSchema: yup.object().shape({
     //   displayName: yup.string().required("Display Name is required"),
@@ -28,36 +34,115 @@ const EmployeeDetails = ({ setShowAction, getEmployeeDetails }) => {
     //     .required("Phone Number is required"),
     // }),
     onSubmit: async (e, { resetForm }) => {
-      try {
-        if (!e.name) return toast.error("Name Required");
-        if (!e.age) return toast.error("Age Required");
-        if (!e.position) return toast.error("Position Required");
-        if (!e.department) return toast.error("Department Required");
-        if (!e.mail) return toast.error("Mail Required");
-        if (!e.mobileNumber) return toast.error("Mobile Number Required");
-
-        const { data } = await axios.post(API.HOST + API.EMPLOYEE_ROUTE, e);
-        if (data?.statusCode === 200) {
-          toast.success(data?.data);
-          resetForm();
-          getEmployeeDetails();
-          setShowAction(false);
-        }
-      } catch (err) {
-        console.log(err);
-        console.log(typeof err?.response?.data?.message === "object");
-        if (
-          typeof err?.response?.data?.message !== "object" &&
-          err?.response?.data?.message !== ""
-        ) {
-          toast.error(err?.response?.data?.message);
-        }
-        if (err?.response?.data?.message?.length > 0) {
-          err?.response?.data?.message?.map((e) => toast.error(e));
-        }
+      if (Object.keys(editData)?.length > 0) {
+        editDetails(e, resetForm);
+      } else {
+        addDetails(e, resetForm);
       }
     },
   });
+
+  const addDetails = async (e, resetForm) => {
+    let url = API.HOST + API.EMPLOYEE_ROUTE;
+    try {
+      if (!e.name) return toast.error("Name Required");
+      if (!e.age) return toast.error("Age Required");
+      if (!e.position) return toast.error("Position Required");
+      if (!e.department) return toast.error("Department Required");
+      if (!e.mail) return toast.error("Mail Required");
+      if (!e.mobileNumber) return toast.error("Mobile Number Required");
+
+      const { data } = await axios.post(API.HOST + API.EMPLOYEE_ROUTE, e);
+      if (data?.statusCode === 200) {
+        toast.success(data?.data);
+        resetForm();
+        getEmployeeDetails();
+        let trackData = {
+          url,
+          method: "POST",
+          request: JSON.stringify(e),
+          response: JSON.stringify(data),
+          statusCode: data?.statusCode,
+          status: "SUCCESS",
+        };
+
+        helperUtils.track(trackData);
+        setShowAction(false);
+      }
+    } catch (err) {
+      console.log(err);
+      console.log(typeof err?.response?.data?.message === "object");
+      if (
+        typeof err?.response?.data?.message !== "object" &&
+        err?.response?.data?.message !== ""
+      ) {
+        toast.error(err?.response?.data?.message);
+      }
+      if (err?.response?.data?.message?.length > 0) {
+        err?.response?.data?.message?.map((e) => toast.error(e));
+      }
+      let trackData = {
+        url: err?.request?.responseURL,
+        method: err?.config?.method?.toUpperCase(),
+        request: "",
+        response: JSON.stringify(err?.request?.response),
+        statusCode: err?.request?.status,
+        status: "ERROR",
+      };
+      helperUtils.track(trackData);
+    }
+  };
+
+  const editDetails = async (e, resetForm) => {
+    let url = `${API.HOST + API.EMPLOYEE_ROUTE}/${employeeId}`;
+    try {
+      //   if (!e.name) return toast.error("Name Required");
+      //   if (!e.age) return toast.error("Age Required");
+      //   if (!e.position) return toast.error("Position Required");
+      //   if (!e.department) return toast.error("Department Required");
+      //   if (!e.mail) return toast.error("Mail Required");
+      //   if (!e.mobileNumber) return toast.error("Mobile Number Required");
+
+      const { data } = await axios.put(url, e);
+      if (data?.statusCode === 200) {
+        // toast.success(data?.data);
+        resetForm();
+        getEmployeeDetails();
+        let trackData = {
+          url,
+          method: "PUT",
+          request: JSON.stringify(e),
+          response: JSON.stringify(data),
+          statusCode: data?.statusCode,
+          status: "SUCCESS",
+        };
+
+        helperUtils.track(trackData);
+        setShowAction(false);
+      }
+    } catch (err) {
+      console.log(err);
+      console.log(typeof err?.response?.data?.message === "object");
+      if (
+        typeof err?.response?.data?.message !== "object" &&
+        err?.response?.data?.message !== ""
+      ) {
+        toast.error(err?.response?.data?.message);
+      }
+      if (err?.response?.data?.message?.length > 0) {
+        err?.response?.data?.message?.map((e) => toast.error(e));
+      }
+      let trackData = {
+        url: err?.request?.responseURL,
+        method: err?.config?.method?.toUpperCase(),
+        request: "",
+        response: JSON.stringify(err?.request?.response),
+        statusCode: err?.request?.status,
+        status: "ERROR",
+      };
+      helperUtils.track(trackData);
+    }
+  };
 
   return (
     <>

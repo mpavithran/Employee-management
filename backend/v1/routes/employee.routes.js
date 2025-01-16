@@ -20,4 +20,10 @@ router.put(
 );
 router.delete("/employees/:id", employeesController.deleteEmployee);
 
+router.post(
+  "/track",
+  validateBody(employeesValidation.track),
+  employeesController.apiTrackDetails
+);
+
 module.exports = router;

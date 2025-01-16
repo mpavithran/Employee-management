@@ -4,6 +4,7 @@ import toast, { Toaster } from "react-hot-toast";
 
 import useStore from "@/hooks/useStore";
 import { API } from "@/utils/API";
+import helperUtils from "@/utils/helperUtils";
 
 import { MdClose, MdEdit } from "react-icons/md";
 import {
@@ -20,28 +21,70 @@ const EmplyeeManagement = () => {
 
   const [showAction, setShowAction] = useState(false);
   const [emplyeeDetails, setEmplyeeDetails] = useState([]);
+  const [editData, setEditData] = useState({});
 
   const getEmployeeDetails = async () => {
+    let url = API.HOST + API.EMPLOYEE_ROUTE;
     try {
-      const { data } = await axios.get(API.HOST + API.EMPLOYEE_ROUTE, {});
+      const { data } = await axios.get(url, {});
 
       setEmplyeeDetails(data?.data);
+
+      let trackData = {
+        url,
+        method: "GET",
+        request: "",
+        response: JSON.stringify(data),
+        statusCode: data?.statusCode,
+        status: "SUCCESS",
+      };
+
+      helperUtils.track(trackData);
     } catch (error) {
+      let trackData = {
+        url: error?.request?.responseURL,
+        method: error?.config?.method?.toUpperCase(),
+        request: "",
+        response: JSON.stringify(error?.request?.response),
+        statusCode: error?.request?.status,
+        status: "ERROR",
+      };
+
+      helperUtils.track(trackData);
       console.log(error);
     }
   };
 
   const deleteEmployee = async (id) => {
+    let url = `${API.HOST + API.EMPLOYEE_ROUTE}/${id}`;
     try {
-      const { data } = await axios.delete(
-        `${API.HOST + API.EMPLOYEE_ROUTE}/${id}`,
-        {}
-      );
+      const { data } = await axios.delete(url, {});
       if (data?.statusCode === 200) {
         toast.success(data?.data);
         getEmployeeDetails();
+
+        let trackData = {
+          url,
+          method: "DELETE",
+          request: "",
+          response: JSON.stringify(data),
+          statusCode: data?.statusCode,
+          status: "SUCCESS",
+        };
+
+        helperUtils.track(trackData);
       }
     } catch (error) {
+      let trackData = {
+        url: error?.request?.responseURL,
+        method: error?.config?.method?.toUpperCase(),
+        request: "",
+        response: JSON.stringify(error?.request?.response),
+        statusCode: error?.request?.status,
+        status: "ERROR",
+      };
+
+      helperUtils.track(trackData);
       console.log(error);
     }
   };
@@ -86,7 +129,11 @@ const EmplyeeManagement = () => {
                     <div className="flex justify-center items-center">
                       <MdEdit
                         className="mr-1 text-xl text-blue-500 cursor-pointer"
-                        onClick={() => setShowAction(each?.id)}
+                        onClick={() => {
+                          setEditData(each);
+                          console.log(each);
+                          setShowAction(true);
+                        }}
                       />
                       <FaTrash
                         className="text-red-500 cursor-pointer"
@@ -135,6 +182,8 @@ const EmplyeeManagement = () => {
             <EmployeeDetails
               setShowAction={setShowAction}
               getEmployeeDetails={getEmployeeDetails}
+              editData={editData}
+              employeeId={editData?.id}
             />
           </div>
         </div>

@@ -1,4 +1,8 @@
 const crypto = require("crypto");
+
+const LogDetails = require("../model/log.details.model");
+const ApiTrackDetails = require("../model/api.track.details.model");
+
 const utils = {};
 
 utils.encryptText = (plainText) => {
@@ -55,6 +59,15 @@ utils.decryptText = (cipherText) => {
   ]);
 
   return decrypted.toString("utf8");
+};
+
+utils.logDetails = async (data) => {
+  console.log(data);
+  try {
+    await LogDetails.create(data);
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 module.exports = utils;

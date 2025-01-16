@@ -12,3 +12,25 @@ CREATE TABLE `employee_details` (
   `status` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
 );
+
+CREATE TABLE `log_details` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `activity` text,
+  `type` varchar(255) DEFAULT NULL,
+  `employee_id` int(11) DEFAULT NULL,
+  `editor` int(11) DEFAULT NULL,
+  `created_datetime` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+);
+
+CREATE TABLE `api_track_details` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `url` varchar(255) NOT NULL,
+  `method` varchar(25) DEFAULT NULL,
+  `request` text,
+  `response` text,
+  `status_code` int(11) DEFAULT NULL,
+  `status` varchar(255) DEFAULT NULL,
+  `created_datetime` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+);

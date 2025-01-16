@@ -4,6 +4,7 @@ const structureUtils = require("../utils/structure.utils");
 const helperUtils = require("../utils/helper.utils");
 
 const Employee = require("../model/employee.details.model");
+const ApiTrackDetails = require("../model/api.track.details.model");
 
 const controller = {};
 
@@ -21,7 +22,7 @@ controller.getAllEmployees = handler(async (req, res) => {
     position: each?.position,
     department: each?.department,
     mailId: helperUtils.decryptText(each?.mailId),
-    mobileNumber: helperUtils.decryptText(each?.mobileNumber),
+    mobileNumber: parseInt(helperUtils.decryptText(each?.mobileNumber)),
     createdDatetime: each?.createdDatetime,
     status: each?.status,
   }));
@@ -42,7 +43,7 @@ controller.addEmployee = handler(async (req, res) => {
     req?.body?.mobileNumber?.toString()
   );
 
-  await Employee.create({
+  let data = {
     name: req?.body?.name,
     age: req?.body?.age,
     position: req?.body?.position,
@@ -50,7 +51,16 @@ controller.addEmployee = handler(async (req, res) => {
     mailId: encryptMail,
     mobileNumber: encryptMobileNumber,
     createdDatetime: new Date(),
-  });
+  };
+
+  await Employee.create(data);
+
+  let logData = {
+    activity: JSON.stringify(data),
+    type: "ADD_EMPLOYEE",
+  };
+
+  helperUtils.logDetails(logData);
 
   return res.json(
     structureUtils.successResponse("Employee Detail added successfully")
@@ -76,7 +86,7 @@ controller.getEmployee = handler(async (req, res) => {
     position: getEmployee?.position,
     department: getEmployee?.department,
     mailId: helperUtils.decryptText(getEmployee?.mailId),
-    mobileNumber: helperUtils.decryptText(getEmployee?.mobileNumber),
+    mobileNumber: parseInt(helperUtils.decryptText(getEmployee?.mobileNumber)),
     createdDatetime: getEmployee?.createdDatetime,
     status: getEmployee?.status,
   };
@@ -121,6 +131,13 @@ controller.updateEmployeeDetails = handler(async (req, res) => {
     status: getEmployee?.status,
   };
 
+  let logData = {
+    activity: JSON.stringify(data),
+    type: "EDIT_EMPLOYEE",
+  };
+
+  helperUtils.logDetails(logData);
+
   return res.json(structureUtils.successResponse(data));
 });
 
@@ -147,9 +164,25 @@ controller.deleteEmployee = handler(async (req, res) => {
     }
   );
 
+  let logData = {
+    activity: JSON.stringify({ id: req?.params?.id }),
+    type: "DELETE_EMPLOYEE",
+  };
+
+  helperUtils.logDetails(logData);
+
   return res.json(
     structureUtils.successResponse("Employee Detail deleted successfully")
   );
+});
+
+controller.apiTrackDetails = handler(async (req, res) => {
+  try {
+    await ApiTrackDetails.create(req?.body);
+    return res.json(structureUtils.successResponse("Tracking added"));
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 module.exports = controller;

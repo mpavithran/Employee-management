@@ -3,6 +3,7 @@ const mode = import.meta.env.VITE_MODE ?? "LOCAL";
 export const API = {
   HOST: "",
   EMPLOYEE_ROUTE: "/api/v1/employee/employees",
+  TRACK: "/api/v1/employee/track",
   //   GET_ALL_EMPLOYEES: "/api/v1/employee/employees",
   //   ADD_EMPLOYEE: "/api/v1/employee/employees",
   //   GET_EMPLOYEE_DETAILS: "/api/v1/employee/employees",

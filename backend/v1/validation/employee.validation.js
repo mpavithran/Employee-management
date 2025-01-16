@@ -7,7 +7,7 @@ validation.addEmployee = Joi.object().keys({
   age: Joi.number().required("Age required"),
   position: Joi.string().required("Position required"),
   department: Joi.string().required("Department required"),
-  mail: Joi.string().required("Mail required"),
+  mail: Joi.string().email().required("Mail required"),
   mobileNumber: Joi.number().required("Mobile Number required"),
 });
 
@@ -33,6 +33,15 @@ validation.updateEmployee = Joi.object().keys({
     "number.base": "Mobile number must be a number",
     "number.min": "Invalid mobile number",
   }),
+});
+
+validation.track = Joi.object().keys({
+  url: Joi.string().strict().required("URL required!"),
+  method: Joi.string().strict().required("Method required!"),
+  request: Joi.string().allow(""),
+  response: Joi.string().strict().required("Response required"),
+  statusCode: Joi.number().strict().required("Status Code required"),
+  status: Joi.string().strict().required("Status required"),
 });
 
 module.exports = validation;
