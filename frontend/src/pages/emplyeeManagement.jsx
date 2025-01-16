@@ -95,9 +95,9 @@ const EmplyeeManagement = () => {
   }, []);
   return (
     <>
-      <div className="flex justify-start items-start w-[100vw] h-screen main">
+      <div className="flex flex-col justify-start items-start w-[100vw] h-screen main">
         <Toaster position="bottom-right" reverseOrder={false} />
-        <div className="w-[80vw] p-4">
+        <div className="w-[80vw] p-4 h-[95%] overflow-scroll">
           <h2 className="ml-8 font-bold text-xl">Employees Details</h2>
           <table className="w-[95%] h-[100%] border-separate border-spacing-y-2 mt-10 text-center bg-[#2F2F2F] mx-auto rounded-lg">
             <thead>
