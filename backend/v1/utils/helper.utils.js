@@ -1,7 +1,11 @@
 const crypto = require("crypto");
+const { v4: uuidv4 } = require("uuid");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const LogDetails = require("../model/log.details.model");
 const ApiTrackDetails = require("../model/api.track.details.model");
+const User = require("../model/users.model");
 
 const utils = {};
 
@@ -67,6 +71,62 @@ utils.logDetails = async (data) => {
     await LogDetails.create(data);
   } catch (error) {
     console.log(error);
+  }
+};
+
+utils.generateRandomId = async (type) => {
+  if (type === "ADMIN") {
+    let userId;
+
+    while (!userId) {
+      userId = uuidv4();
+      const ifExist = await User.count({
+        where: {
+          userId,
+        },
+      });
+
+      if (ifExist > 0) userId = null;
+    }
+    return userId;
+  }
+};
+
+utils.passwordHashing = async (password) => {
+  try {
+    const salt = parseInt(process?.env?.SALT);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    return hashedPassword;
+  } catch (err) {
+    console.error("Error hashing password:", err);
+  }
+};
+
+utils.passwordCompare = async (password, hashedPassword) => {
+  try {
+    const match = await bcrypt.compare(password, hashedPassword);
+    return match;
+  } catch (err) {
+    console.error("Error comparing password:", err);
+  }
+};
+
+utils.generateUserToken = (payload) => {
+  const options = {
+    //   expiresIn: "1h",
+  };
+  const token = jwt.sign(payload, process?.env?.JWT_SECRET_KEY, options);
+  return token;
+};
+
+utils.verifyUserToken = (token) => {
+  try {
+    const decoded = jwt.verify(token, process?.env?.JWT_SECRET_KEY);
+    console.log("Decoded Payload:", decoded);
+    return decoded;
+  } catch (error) {
+    console.error("Token Verification Failed:", error.message);
+    return null;
   }
 };
 

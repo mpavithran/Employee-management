@@ -4,6 +4,8 @@ export const API = {
   HOST: "",
   EMPLOYEE_ROUTE: "/api/v1/employee/employees",
   TRACK: "/api/v1/employee/track",
+  SIGNUP: "/api/v1/user/signUp",
+  SIGNIN: "/api/v1/user/signIn",
   //   GET_ALL_EMPLOYEES: "/api/v1/employee/employees",
   //   ADD_EMPLOYEE: "/api/v1/employee/employees",
   //   GET_EMPLOYEE_DETAILS: "/api/v1/employee/employees",

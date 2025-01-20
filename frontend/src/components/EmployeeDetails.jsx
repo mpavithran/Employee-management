@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { useFormik } from "formik";
-import { useNavigate } from "react-router-dom";
 
 import toast, { Toaster } from "react-hot-toast";
 import useStore from "@/hooks/useStore";
@@ -8,6 +7,7 @@ import { API } from "@/utils/API";
 import axios from "axios";
 import helperUtils from "@/utils/helperUtils";
 import * as yup from "yup";
+import useUser from "@/hooks/useUser";
 
 const EmployeeDetails = ({
   setShowAction,
@@ -15,8 +15,10 @@ const EmployeeDetails = ({
   editData,
   employeeId,
 }) => {
-  const navigate = useNavigate();
-  const { setActiveTab } = useStore();
+  const { userDetails } = useUser();
+
+  const headers = helperUtils.headers(userDetails?.userToken);
+
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
@@ -60,10 +62,14 @@ const EmployeeDetails = ({
         .required("Mobile number is required"),
     }),
     onSubmit: async (e, { resetForm }) => {
-      if (Object.keys(editData)?.length > 0) {
-        editDetails(e, resetForm);
-      } else {
-        addDetails(e, resetForm);
+      try {
+        if (editData && Object.keys(editData)?.length > 0) {
+          editDetails(e, resetForm);
+        } else {
+          addDetails(e, resetForm);
+        }
+      } catch (error) {
+        console.log(error);
       }
     },
   });
@@ -78,11 +84,14 @@ const EmployeeDetails = ({
       if (!e.mail) return toast.error("Mail Required");
       if (!e.mobileNumber) return toast.error("Mobile Number Required");
 
-      const { data } = await axios.post(API.HOST + API.EMPLOYEE_ROUTE, e);
+      const { data } = await axios.post(
+        API.HOST + API.EMPLOYEE_ROUTE,
+        e,
+        headers
+      );
       if (data?.statusCode === 200) {
         toast.success(data?.data);
         resetForm();
-        getEmployeeDetails();
         let trackData = {
           url,
           method: "POST",
@@ -93,7 +102,6 @@ const EmployeeDetails = ({
         };
 
         helperUtils.track(trackData);
-        setShowAction(false);
       }
     } catch (err) {
       console.log(err);
@@ -133,7 +141,7 @@ const EmployeeDetails = ({
       requestBody["mobileNumber"] = e.mobileNumber;
     if (Object.keys(requestBody)?.length > 0) {
       try {
-        const { data } = await axios.put(url, requestBody);
+        const { data } = await axios.put(url, requestBody, headers);
         if (data?.statusCode === 200) {
           // toast.success(data?.data);
           resetForm();

@@ -26,7 +26,7 @@ const LogDetails = db.define(
     },
     editor: {
       field: "editor",
-      type: Sequelize.DataTypes.INTEGER,
+      type: Sequelize.DataTypes.STRING,
     },
     createdDatetime: {
       field: "created_datetime",

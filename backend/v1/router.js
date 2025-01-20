@@ -2,10 +2,12 @@ const express = require("express");
 const router = express.Router();
 
 const employeeRouter = require("./routes/employee.routes");
+const userRouter = require("./routes/users.routes");
 
 const { errorHandler } = require("./middleware/error.middleware");
 
 router.use("/employee", employeeRouter);
+router.use("/user", userRouter);
 
 router.use((err, req, res, next) => errorHandler(err, req, res));
 

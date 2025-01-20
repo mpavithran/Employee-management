@@ -43,6 +43,14 @@ controller.addEmployee = handler(async (req, res) => {
     req?.body?.mobileNumber?.toString()
   );
 
+  const alreadyExist = await Employee.count({
+    where: {
+      mailId: encryptMail,
+    },
+  });
+
+  if (alreadyExist > 0) throw "409| Employee mail already found";
+
   let data = {
     name: req?.body?.name,
     age: req?.body?.age,
@@ -53,11 +61,13 @@ controller.addEmployee = handler(async (req, res) => {
     createdDatetime: new Date(),
   };
 
-  await Employee.create(data);
+  const createdData = await Employee.create(data);
 
   let logData = {
     activity: JSON.stringify(data),
     type: "ADD_EMPLOYEE",
+    employeeId: createdData?.id,
+    editor: req?.user?.userId,
   };
 
   helperUtils.logDetails(logData);
@@ -102,6 +112,7 @@ controller.updateEmployeeDetails = handler(async (req, res) => {
       status: 1,
     },
   });
+
   if (!getEmployee) throw "404|Invalid employee id";
 
   let updateData = {
@@ -134,6 +145,8 @@ controller.updateEmployeeDetails = handler(async (req, res) => {
   let logData = {
     activity: JSON.stringify(data),
     type: "EDIT_EMPLOYEE",
+    employeeId: req?.params?.id,
+    editor: req?.user?.userId,
   };
 
   helperUtils.logDetails(logData);
@@ -167,6 +180,8 @@ controller.deleteEmployee = handler(async (req, res) => {
   let logData = {
     activity: JSON.stringify({ id: req?.params?.id }),
     type: "DELETE_EMPLOYEE",
+    employeeId: req?.params?.id,
+    editor: req?.user?.userId,
   };
 
   helperUtils.logDetails(logData);

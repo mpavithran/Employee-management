@@ -15,9 +15,13 @@ import {
   FaTrash,
 } from "react-icons/fa";
 import EmployeeDetails from "@/components/EmployeeDetails";
+import useUser from "@/hooks/useUser";
 
 const EmplyeeManagement = () => {
   const { activeTab, setActiveTab } = useStore();
+  const { userDetails } = useUser();
+
+  const headers = helperUtils.headers(userDetails?.userToken);
 
   const [showAction, setShowAction] = useState(false);
   const [emplyeeDetails, setEmplyeeDetails] = useState([]);
@@ -25,8 +29,9 @@ const EmplyeeManagement = () => {
 
   const getEmployeeDetails = async () => {
     let url = API.HOST + API.EMPLOYEE_ROUTE;
+
     try {
-      const { data } = await axios.get(url, {});
+      const { data } = await axios.get(url, headers);
 
       setEmplyeeDetails(data?.data);
 
@@ -58,7 +63,7 @@ const EmplyeeManagement = () => {
   const deleteEmployee = async (id) => {
     let url = `${API.HOST + API.EMPLOYEE_ROUTE}/${id}`;
     try {
-      const { data } = await axios.delete(url, {});
+      const { data } = await axios.delete(url, headers);
       if (data?.statusCode === 200) {
         toast.success(data?.data);
         getEmployeeDetails();
